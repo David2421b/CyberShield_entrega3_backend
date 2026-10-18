@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum CourseCategory {
+  RED_TEAM  @map("Red Team")
+  BLUE_TEAM @map("Blue Team")
+  DFIR
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String         @db.VarChar(120)
+  email        String         @unique @db.VarChar(255)
+  passwordHash String         @map("password_hash") @db.VarChar(255)
+  role         UserRole       @default(user)
+  enrollments  Enrollment[]
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Course {
+  id          Int             @id @default(autoincrement())
+  title       String          @db.VarChar(180)
+  slug        String          @unique @db.VarChar(200)
+  category    CourseCategory
+  level       String          @db.VarChar(40)
+  duration    String          @db.VarChar(40)
+  price       Decimal         @db.Decimal(10, 2)
+  image       String          @db.Text
+  description String          @db.Text
+  enrollments Enrollment[]
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("courses")
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  courseId  Int      @map("course_id")
+  message   String?  @db.VarChar(2000)
+  status    String   @default("pending") @db.VarChar(30)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, createdAt])
+  @@index([courseId])
+  @@map("enrollments")
+}

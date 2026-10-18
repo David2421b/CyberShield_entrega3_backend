@@ -13,8 +13,25 @@ Backend de la Entrega 3 de CyberShield Academy. La API en TypeScript servirá lo
 2. Copia `.env.example` a `.env` y configura PostgreSQL y un secreto JWT propio.
 3. Ejecuta `npm run dev` para iniciar el servidor de desarrollo.
 
-Los comandos de Prisma para generar el cliente, aplicar migraciones y cargar el seed están declarados en `package.json`; se habilitarán al definir el modelo de datos en el siguiente paso.
+4. Ejecuta `npm run prisma:generate` para generar el cliente de Prisma.
+5. Ejecuta `npm run prisma:migrate -- --name init` para crear las tablas.
+6. Ejecuta `npm run prisma:seed` para cargar cursos y cuentas de demostración.
+
+El seed crea estas cuentas únicamente para el ambiente de demostración de la entrega:
+
+| Rol | Correo | Contraseña |
+| --- | --- | --- |
+| admin | `admin@cybershield.local` | `Admin123!` |
+| user | `user@cybershield.local` | `User123!` |
+
+Las contraseñas se guardan como hashes bcrypt.
 
 ## Arquitectura
 
-El código se organizará en cuatro capas: `domain`, `application`, `infrastructure` e `interface` bajo `src/`. Prisma quedará en infraestructura.
+El código se organizará en cuatro capas: `domain`, `application`, `infrastructure` e `interface` bajo `src/`. El esquema y el seed de Prisma viven en `prisma/`; el cliente generado se usará desde infraestructura.
+
+## Modelo de datos
+
+- `users`: cuentas con correo único, hash de contraseña y rol.
+- `courses`: catálogo original de ocho cursos de CyberShield Academy.
+- `enrollments`: solicitudes de inscripción relacionadas con la cuenta autenticada y el curso elegido.
