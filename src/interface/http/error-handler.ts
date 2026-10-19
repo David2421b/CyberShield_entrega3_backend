@@ -4,6 +4,17 @@ import { ZodError } from "zod";
 import { AppError } from "../../domain/errors/app-error";
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
+  if (typeof error === "object" && error !== null && "type" in error) {
+    const parserError = error as { type?: unknown };
+    if (parserError.type === "entity.parse.failed") {
+      res.status(400).json({ error: "El cuerpo de la solicitud no contiene JSON válido." });
+      return;
+    }
+    if (parserError.type === "entity.too.large") {
+      res.status(413).json({ error: "El cuerpo de la solicitud supera el tamaño permitido." });
+      return;
+    }
+  }
   if (error instanceof AppError) {
     res.status(error.statusCode).json({ error: error.message });
     return;

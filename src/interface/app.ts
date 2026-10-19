@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { courseRouter } from "./courses/course-router";
+import { authRouter } from "./auth/auth-router";
 import { errorHandler } from "./http/error-handler";
 import { notFound } from "./http/not-found";
 
@@ -16,6 +17,7 @@ app.use(express.json({ limit: "1mb" }));
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "cybershield-api" });
 });
+app.use("/api/auth", authRouter);
 app.use("/api/cursos", courseRouter);
 app.use(notFound);
 app.use(errorHandler);
