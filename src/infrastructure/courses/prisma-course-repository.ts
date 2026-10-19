@@ -1,5 +1,5 @@
 import { CourseCategory as PrismaCourseCategory, Prisma } from "@prisma/client";
-import type { Course, CourseCategory, CourseFilters, CourseRepository } from "../../domain/courses/course";
+import type { Course, CourseCategory, CourseFilters, CourseRepository, CourseWriteInput } from "../../domain/courses/course";
 import { prisma } from "../database/prisma";
 
 const toDomainCategory: Record<PrismaCourseCategory, CourseCategory> = {
@@ -8,7 +8,23 @@ const toDomainCategory: Record<PrismaCourseCategory, CourseCategory> = {
   [PrismaCourseCategory.DFIR]: "DFIR",
 };
 
-function toCourse(row: Prisma.CourseGetPayload<object>): Course {
+const toPrismaCategory: Record<CourseCategory, PrismaCourseCategory> = {
+  "Red Team": PrismaCourseCategory.RED_TEAM,
+  "Blue Team": PrismaCourseCategory.BLUE_TEAM,
+  DFIR: PrismaCourseCategory.DFIR,
+};
+
+function toPersistence(input: CourseWriteInput) {
+  const slug = input.title
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return { ...input, price: input.price, slug, category: toPrismaCategory[input.category] };
+}
+
+function toCourse(row: Prisma.CourseGetPayload<Prisma.CourseDefaultArgs>): Course {
   return {
     id: row.id,
     title: row.title,
@@ -42,5 +58,17 @@ export class PrismaCourseRepository implements CourseRepository {
   async findById(id: number) {
     const row = await prisma.course.findUnique({ where: { id } });
     return row ? toCourse(row) : null;
+  }
+
+  async create(input: CourseWriteInput) {
+    return toCourse(await prisma.course.create({ data: toPersistence(input) }));
+  }
+
+  async update(id: number, input: CourseWriteInput) {
+    return toCourse(await prisma.course.update({ where: { id }, data: toPersistence(input) }));
+  }
+
+  async delete(id: number) {
+    await prisma.course.delete({ where: { id } });
   }
 }

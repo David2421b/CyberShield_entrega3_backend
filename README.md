@@ -43,7 +43,11 @@ El código se organizará en cuatro capas: `domain`, `application`, `infrastruct
 - `POST /api/auth/login`: verifica credenciales y devuelve un JWT con expiración y el usuario público (sin hash de contraseña). Credenciales incorrectas responden `401` con un mensaje genérico.
 - `GET /api/cursos?page=1&limit=6&category=Red%20Team`: catálogo paginado. La respuesta incluye `pagination` y `data`; `category` es opcional y acepta `Red Team`, `Blue Team` o `DFIR`.
 - `GET /api/cursos/:id`: detalle público de un curso.
+- `POST /api/cursos`, `PUT /api/cursos/:id`, `DELETE /api/cursos/:id`: CRUD del catálogo, solo para admin.
+- `POST /api/inscripciones`: crea una inscripción para el usuario autenticado; recibe `courseId` y `message` opcional. El usuario se obtiene del token.
+- `GET /api/inscripciones/mias`: lista las inscripciones del usuario autenticado.
+- `GET /api/inscripciones`: lista todas las inscripciones, solo para admin.
 
-El middleware `authenticate` valida `Authorization: Bearer <token>` y adjunta únicamente `id` y `role` del usuario autenticado a la petición. `requireAdmin` devuelve `403` para cuentas sin rol admin. Se aplicará a las rutas de escritura y administración en los siguientes pasos.
+El middleware `authenticate` valida `Authorization: Bearer <token>` y adjunta únicamente `id` y `role` del usuario autenticado a la petición. `requireAdmin` devuelve `403` para cuentas sin rol admin y ya protege la escritura del catálogo y la consulta global de inscripciones.
 
 Los parámetros inválidos responden `400`, los cursos inexistentes `404` y los errores inesperados `500` sin exponer trazas internas.

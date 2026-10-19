@@ -21,4 +21,9 @@ export interface CourseFilters {
 export interface CourseRepository {
   findMany(filters: CourseFilters): Promise<{ data: Course[]; total: number }>;
   findById(id: number): Promise<Course | null>;
+  create(input: CourseWriteInput): Promise<Course>;
+  update(id: number, input: CourseWriteInput): Promise<Course>;
+  delete(id: number): Promise<void>;
 }
+
+export type CourseWriteInput = Omit<Course, "id" | "slug">;
