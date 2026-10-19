@@ -35,3 +35,11 @@ El código se organizará en cuatro capas: `domain`, `application`, `infrastruct
 - `users`: cuentas con correo único, hash de contraseña y rol.
 - `courses`: catálogo original de ocho cursos de CyberShield Academy.
 - `enrollments`: solicitudes de inscripción relacionadas con la cuenta autenticada y el curso elegido.
+
+## API disponible
+
+- `GET /api/health`: estado del servicio.
+- `GET /api/cursos?page=1&limit=6&category=Red%20Team`: catálogo paginado. La respuesta incluye `pagination` y `data`; `category` es opcional y acepta `Red Team`, `Blue Team` o `DFIR`.
+- `GET /api/cursos/:id`: detalle público de un curso.
+
+Los parámetros inválidos responden `400`, los cursos inexistentes `404` y los errores inesperados `500` sin exponer trazas internas.
