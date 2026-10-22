@@ -3,10 +3,12 @@ import type { RequestHandler } from "express";
 import { RegisterUser } from "../../application/auth/register-user";
 import { LoginUser } from "../../application/auth/login-user";
 import { PrismaAuthUserRepository } from "../../infrastructure/auth/prisma-auth-user-repository";
+import { env } from "../../infrastructure/config/env";
+import type { SignOptions } from "jsonwebtoken";
 
 const users = new PrismaAuthUserRepository();
 const registerUser = new RegisterUser(users);
-const loginUser = new LoginUser(users);
+const loginUser = new LoginUser(users, env.JWT_SECRET, env.JWT_EXPIRES_IN as SignOptions["expiresIn"]);
 
 const registerSchema = z.object({
   name: z.string().trim().min(3).max(120),

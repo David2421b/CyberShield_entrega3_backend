@@ -1,9 +1,9 @@
 import { app } from "./app";
 import { prisma } from "../infrastructure/database/prisma";
+import { env } from "../infrastructure/config/env";
 
-const port = Number(process.env.PORT ?? 4000);
-const server = app.listen(port, () => {
-  console.log(`CyberShield API disponible en http://localhost:${port}`);
+const server = app.listen(env.PORT, () => {
+  console.log(`CyberShield API disponible en http://localhost:${env.PORT}`);
 });
 
 function shutdown(signal: string) {

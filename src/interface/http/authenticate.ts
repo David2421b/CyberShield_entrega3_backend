@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { AppError } from "../../domain/errors/app-error";
 import type { UserRole } from "../../domain/auth/auth-user";
+import { env } from "../../infrastructure/config/env";
 
 export interface AuthenticatedUser {
   id: string;
@@ -29,14 +30,8 @@ export const authenticate: RequestHandler = (req, _res, next) => {
     return;
   }
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    next(new Error("Falta configurar JWT_SECRET."));
-    return;
-  }
-
   try {
-    const payload = jwt.verify(authorization.slice(7), secret);
+    const payload = jwt.verify(authorization.slice(7), env.JWT_SECRET);
     if (!isAuthPayload(payload)) {
       next(new AppError("El token no es válido.", 401));
       return;

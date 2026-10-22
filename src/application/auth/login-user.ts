@@ -9,7 +9,11 @@ export interface LoginResult {
 }
 
 export class LoginUser {
-  constructor(private readonly users: AuthUserRepository) {}
+  constructor(
+    private readonly users: AuthUserRepository,
+    private readonly jwtSecret: string,
+    private readonly jwtExpiresIn: SignOptions["expiresIn"],
+  ) {}
 
   async execute(emailInput: string, password: string): Promise<LoginResult> {
     const user = await this.users.findByEmail(emailInput.trim().toLowerCase());
@@ -17,10 +21,7 @@ export class LoginUser {
       throw new AppError("Correo electrónico o contraseña incorrectos.", 401);
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("Falta configurar JWT_SECRET.");
-    const expiresIn = (process.env.JWT_EXPIRES_IN || "1d") as SignOptions["expiresIn"];
-    const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn });
+    const token = jwt.sign({ id: user.id, role: user.role }, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
     const { passwordHash: _passwordHash, ...publicUser } = user;
     return { token, user: publicUser };
   }

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient, CourseCategory, UserRole } from "@prisma/client";
 import { hash } from "bcryptjs";
 

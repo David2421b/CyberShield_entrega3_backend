@@ -10,7 +10,7 @@ Backend de la Entrega 3 de CyberShield Academy. La API en TypeScript servirá lo
 ## Configuración local
 
 1. Instala dependencias con `npm install`.
-2. Copia `.env.example` a `.env` y configura PostgreSQL y un secreto JWT propio.
+2. Copia `.env.example` a `.env`, configura PostgreSQL y reemplaza `JWT_SECRET` por un secreto propio de al menos 32 caracteres. La API valida sus variables al arrancar.
 3. Ejecuta `npm run dev` para iniciar el servidor de desarrollo.
 
 4. Ejecuta `npm run prisma:generate` para generar el cliente de Prisma.
