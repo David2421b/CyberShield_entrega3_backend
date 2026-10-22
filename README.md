@@ -11,11 +11,12 @@ Backend de la Entrega 3 de CyberShield Academy. La API en TypeScript servirá lo
 
 1. Instala dependencias con `npm install`.
 2. Copia `.env.example` a `.env`, configura PostgreSQL y reemplaza `JWT_SECRET` por un secreto propio de al menos 32 caracteres. La API valida sus variables al arrancar.
-3. Ejecuta `npm run dev` para iniciar el servidor de desarrollo.
+3. Ejecuta `npm run prisma:generate` para generar el cliente de Prisma.
+4. Ejecuta `npm run prisma:migrate -- --name init` para crear las tablas.
+5. Ejecuta `npm run prisma:seed` para cargar cursos y cuentas de demostración.
+6. Ejecuta `npm run dev` para iniciar el servidor de desarrollo en `http://localhost:4000`.
 
-4. Ejecuta `npm run prisma:generate` para generar el cliente de Prisma.
-5. Ejecuta `npm run prisma:migrate -- --name init` para crear las tablas.
-6. Ejecuta `npm run prisma:seed` para cargar cursos y cuentas de demostración.
+En Render o Railway configura las mismas variables como secretos del servicio. `FRONTEND_URL` debe ser el origen exacto del sitio desplegado en Vercel, por ejemplo `https://tu-sitio.vercel.app`; la API no permite el origen comodín `*`. `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN` y `PORT` también se configuran en la plataforma, y el archivo `.env` local no se sube al repositorio.
 
 El seed crea estas cuentas únicamente para el ambiente de demostración de la entrega:
 
@@ -28,7 +29,7 @@ Las contraseñas se guardan como hashes bcrypt.
 
 ## Arquitectura
 
-El código se organizará en cuatro capas: `domain`, `application`, `infrastructure` e `interface` bajo `src/`. El esquema y el seed de Prisma viven en `prisma/`; el cliente generado se usará desde infraestructura.
+El código se organiza en cuatro capas: `domain`, `application`, `infrastructure` e `interface` bajo `src/`. El esquema y el seed de Prisma viven en `prisma/`; el cliente generado se usa desde infraestructura.
 
 ## Modelo de datos
 
