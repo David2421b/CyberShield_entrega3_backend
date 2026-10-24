@@ -123,7 +123,7 @@ El backend valida el JWT y vuelve a comprobar los permisos en cada ruta protegid
 
 ## Despliegue
 
-El backend está preparado para ejecutarse en Render o Railway, pero el servicio público aún está pendiente de publicación. El archivo `render.yaml` define una API y una base PostgreSQL para Render: compila el proyecto, aplica las migraciones al iniciar y carga el seed una sola vez después del primer despliegue exitoso. Durante la creación del Blueprint, proporciona contraseñas fuertes para `DEMO_ADMIN_PASSWORD` y `DEMO_USER_PASSWORD`. Si Vercel aún no está desplegado, usa `http://localhost:3000` como `FRONTEND_URL` temporal y cámbiala al origen público exacto cuando tengas la URL. CORS no usa el comodín `*`.
+El archivo `render.yaml` define la API y una base PostgreSQL para Render. Al iniciar, aplica las migraciones, carga los datos de demostración que falten y arranca el servidor. El seed conserva los cursos y cuentas existentes para no sobrescribir cambios en reinicios. Configura `FRONTEND_URL` con el origen público exacto de Vercel. CORS no usa el comodín `*`.
 
 La configuración inicial usa los planes gratuitos de Render para una revisión académica. Render indica que sus bases PostgreSQL gratuitas expiran a los 30 días; actualiza a un plan con persistencia antes de depender de esos datos por más tiempo.
 

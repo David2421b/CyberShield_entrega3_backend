@@ -14,9 +14,8 @@ services:
     plan: free
     region: ohio
     buildCommand: npm ci && npm run prisma:generate && npm run build
-    startCommand: npx prisma migrate deploy && npm run start
+    startCommand: npx prisma migrate deploy && npm run prisma:seed && npm run start
     healthCheckPath: /api/health
-    initialDeployHook: npm run prisma:seed
     envVars:
       - key: DATABASE_URL
         fromDatabase:

@@ -93,18 +93,18 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: "admin@cybershield.local" },
-    update: { name: "Admin CyberShield", passwordHash: adminPassword, role: UserRole.admin },
+    update: {},
     create: { name: "Admin CyberShield", email: "admin@cybershield.local", passwordHash: adminPassword, role: UserRole.admin },
   });
   await prisma.user.upsert({
     where: { email: "user@cybershield.local" },
-    update: { name: "Usuario CyberShield", passwordHash: userPassword, role: UserRole.user },
+    update: {},
     create: { name: "Usuario CyberShield", email: "user@cybershield.local", passwordHash: userPassword, role: UserRole.user },
   });
 
   for (const course of courses) {
     const { slug, ...data } = course;
-    await prisma.course.upsert({ where: { slug }, update: data, create: { slug, ...data } });
+    await prisma.course.upsert({ where: { slug }, update: {}, create: { slug, ...data } });
   }
 }
 
