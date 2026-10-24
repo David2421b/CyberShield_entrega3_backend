@@ -10,7 +10,11 @@ import { env } from "../infrastructure/config/env";
 export const app = express();
 
 app.disable("x-powered-by");
-app.use(cors({ origin: env.FRONTEND_URL }));
+const localFrontendOrigins = ["http://localhost:3000", "http://127.0.0.1:3000"];
+const allowedOrigins = localFrontendOrigins.includes(env.FRONTEND_URL)
+  ? localFrontendOrigins
+  : [env.FRONTEND_URL];
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/api/health", (_req, res) => {
