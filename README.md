@@ -1,54 +1,137 @@
-# CyberShield Academy API
+# CyberShield Academy — Backend
 
-Backend de la Entrega 3 de CyberShield Academy. La API en TypeScript servirá los cursos del catálogo original y permitirá gestionar inscripciones con cuentas y roles.
+API REST de la Entrega 3 de CyberShield Academy. Está desarrollada con Node.js, TypeScript, Express y Prisma, y guarda usuarios, cursos e inscripciones en PostgreSQL.
+
+## Enlaces de la entrega
+
+- API desplegada: **pendiente de publicar**.
+- Frontend desplegado: **pendiente de publicar**.
+- Repositorio público del backend: **pendiente de publicar**.
+- Repositorio público del frontend: **pendiente de publicar**.
+
+Completa estos enlaces después de publicar los repositorios y desplegar la aplicación. No subas archivos `.env` ni secretos al repositorio.
+
+## Funcionalidades
+
+- Registro e inicio de sesión con contraseñas protegidas con bcrypt y autenticación JWT.
+- Catálogo público de cursos con paginación y filtro por categoría.
+- Administración de cursos restringida al rol `admin`.
+- Creación y consulta de inscripciones; cada usuario consulta las suyas y el administrador puede consultar todas.
+- Validación de datos y respuestas de error centralizadas.
+
+## Tecnologías y arquitectura
+
+- Node.js 20 o posterior, TypeScript y Express.
+- PostgreSQL y Prisma ORM.
+- Zod para validar la configuración y los datos de entrada.
+- Cuatro capas bajo `src/`: `domain`, `application`, `infrastructure` e `interface`.
 
 ## Requisitos
 
-- Node.js 20 o posterior
-- PostgreSQL
+- Node.js 20 o posterior y npm.
+- Una instancia de PostgreSQL accesible desde el backend.
 
-## Configuración local
+## Ejecución local
 
-1. Instala dependencias con `npm install`.
-2. Copia `.env.example` a `.env`, configura PostgreSQL y reemplaza `JWT_SECRET` por un secreto propio de al menos 32 caracteres. La API valida sus variables al arrancar.
-3. Ejecuta `npm run prisma:generate` para generar el cliente de Prisma.
-4. Ejecuta `npm run prisma:migrate -- --name init` para crear las tablas.
-5. Ejecuta `npm run prisma:seed` para cargar cursos y cuentas de demostración.
-6. Ejecuta `npm run dev` para iniciar el servidor de desarrollo en `http://localhost:4000`.
+1. Instala las dependencias:
 
-En Render o Railway configura las mismas variables como secretos del servicio. `FRONTEND_URL` debe ser el origen exacto del sitio desplegado en Vercel, por ejemplo `https://tu-sitio.vercel.app`; la API no permite el origen comodín `*`. `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN` y `PORT` también se configuran en la plataforma, y el archivo `.env` local no se sube al repositorio.
+   ```bash
+   npm install
+   ```
 
-El seed crea estas cuentas únicamente para el ambiente de demostración de la entrega:
+2. Copia `.env.example` a `.env` y configura las variables. Usa un `JWT_SECRET` aleatorio de al menos 32 caracteres. Si PostgreSQL usa otro puerto, actualiza `DATABASE_URL`.
+
+3. Genera el cliente de Prisma y aplica las migraciones locales:
+
+   ```bash
+   npm run prisma:generate
+   npm run prisma:migrate -- --name init
+   ```
+
+4. Carga los cursos y las cuentas de demostración:
+
+   ```bash
+   npm run prisma:seed
+   ```
+
+5. Inicia la API:
+
+   ```bash
+   npm run dev
+   ```
+
+La API queda disponible en `http://localhost:4000`. Comprueba el estado en `http://localhost:4000/api/health`.
+
+### Variables de entorno
+
+| Variable | Uso |
+| --- | --- |
+| `DATABASE_URL` | Cadena de conexión a PostgreSQL, con el esquema `public`. |
+| `JWT_SECRET` | Secreto aleatorio de al menos 32 caracteres para firmar tokens. |
+| `JWT_EXPIRES_IN` | Vigencia del token; el valor predeterminado es `1d`. |
+| `PORT` | Puerto HTTP de la API; el valor predeterminado es `4000`. |
+| `FRONTEND_URL` | Origen permitido por CORS. En producción debe coincidir exactamente con la URL de Vercel. |
+
+En producción configura estas variables en el servicio del backend, junto con una base PostgreSQL administrada. Ejecuta `npx prisma migrate deploy` para aplicar las migraciones existentes. `npm run prisma:migrate` usa `prisma migrate dev` y se reserva para desarrollo local.
+
+## Cuentas de demostración
+
+El seed crea estas cuentas para la revisión local de la entrega:
 
 | Rol | Correo | Contraseña |
 | --- | --- | --- |
-| admin | `admin@cybershield.local` | `Admin123!` |
-| user | `user@cybershield.local` | `User123!` |
+| Administrador | `admin@cybershield.local` | `Admin123!` |
+| Usuario | `user@cybershield.local` | `User123!` |
 
-Las contraseñas se guardan como hashes bcrypt.
+Son credenciales de demostración. No reutilices estas contraseñas fuera de un entorno local o académico controlado. El seed almacena las contraseñas como hashes bcrypt.
 
-## Arquitectura
+## API
 
-El código se organiza en cuatro capas: `domain`, `application`, `infrastructure` e `interface` bajo `src/`. El esquema y el seed de Prisma viven en `prisma/`; el cliente generado se usa desde infraestructura.
+Las rutas protegidas requieren `Authorization: Bearer <token>`. El token se obtiene con `POST /api/auth/login`.
+
+| Método | Ruta | Acceso | Descripción |
+| --- | --- | --- | --- |
+| `GET` | `/api/health` | Público | Estado de la API. |
+| `POST` | `/api/auth/register` | Público | Registra un usuario; el correo duplicado devuelve `409`. |
+| `POST` | `/api/auth/login` | Público | Valida credenciales y devuelve el usuario público y un JWT. |
+| `GET` | `/api/cursos` | Público | Lista cursos; admite `page`, `limit` y `category`. |
+| `GET` | `/api/cursos/:id` | Público | Consulta un curso por identificador. |
+| `POST` | `/api/cursos` | Administrador | Crea un curso. |
+| `PUT` | `/api/cursos/:id` | Administrador | Actualiza un curso. |
+| `DELETE` | `/api/cursos/:id` | Administrador | Elimina un curso. |
+| `POST` | `/api/inscripciones` | Usuario autenticado | Crea una inscripción con `courseId` y `message` opcional. |
+| `GET` | `/api/inscripciones/mias` | Usuario autenticado | Lista las inscripciones propias. |
+| `GET` | `/api/inscripciones` | Administrador | Lista todas las inscripciones. |
+
+Ejemplo de consulta paginada:
+
+```text
+GET /api/cursos?page=1&limit=6&category=Red%20Team
+```
+
+La respuesta incluye `data` y `pagination`. Las categorías válidas son `Red Team`, `Blue Team` y `DFIR`. Los parámetros inválidos responden `400`, los recursos inexistentes `404` y los errores inesperados `500` sin exponer trazas internas.
 
 ## Modelo de datos
 
-- `users`: cuentas con correo único, hash de contraseña y rol.
-- `courses`: catálogo original de ocho cursos de CyberShield Academy.
-- `enrollments`: solicitudes de inscripción relacionadas con la cuenta autenticada y el curso elegido.
+- `users`: nombre, correo único, hash de contraseña y rol.
+- `courses`: los ocho cursos del catálogo de CyberShield.
+- `enrollments`: curso, usuario, mensaje opcional y estado de la solicitud.
 
-## API disponible
+El backend valida el JWT y vuelve a comprobar los permisos en cada ruta protegida; la protección de las pantallas del frontend no reemplaza esta autorización.
 
-- `GET /api/health`: estado del servicio.
-- `POST /api/auth/register`: registra una cuenta validando nombre, correo y contraseña; devuelve `409` si el correo ya está registrado.
-- `POST /api/auth/login`: verifica credenciales y devuelve un JWT con expiración y el usuario público (sin hash de contraseña). Credenciales incorrectas responden `401` con un mensaje genérico.
-- `GET /api/cursos?page=1&limit=6&category=Red%20Team`: catálogo paginado. La respuesta incluye `pagination` y `data`; `category` es opcional y acepta `Red Team`, `Blue Team` o `DFIR`.
-- `GET /api/cursos/:id`: detalle público de un curso.
-- `POST /api/cursos`, `PUT /api/cursos/:id`, `DELETE /api/cursos/:id`: CRUD del catálogo, solo para admin.
-- `POST /api/inscripciones`: crea una inscripción para el usuario autenticado; recibe `courseId` y `message` opcional. El usuario se obtiene del token.
-- `GET /api/inscripciones/mias`: lista las inscripciones del usuario autenticado.
-- `GET /api/inscripciones`: lista todas las inscripciones, solo para admin.
+## Despliegue
 
-El middleware `authenticate` valida `Authorization: Bearer <token>` y adjunta únicamente `id` y `role` del usuario autenticado a la petición. `requireAdmin` devuelve `403` para cuentas sin rol admin y ya protege la escritura del catálogo y la consulta global de inscripciones.
+El backend está preparado para ejecutarse en Render o Railway, pero el servicio público aún está pendiente de publicación. Configura el comando de compilación con `npm run prisma:generate && npm run build` y el comando de inicio con `npm run start`. Añade una base PostgreSQL y configura los secretos descritos arriba. En `FRONTEND_URL` coloca el origen exacto del frontend desplegado; CORS no usa el comodín `*`.
 
-Los parámetros inválidos responden `400`, los cursos inexistentes `404` y los errores inesperados `500` sin exponer trazas internas.
+## Explicación para la sustentación
+
+Completa esta sección con tus propias palabras antes de entregar:
+
+- ¿Cómo se divide una petición entre las capas `interface`, `application`, `domain` e `infrastructure`?
+- ¿Cómo se valida la identidad del usuario y se limita una operación al rol administrador?
+- ¿Cómo se relacionan usuarios, cursos e inscripciones en PostgreSQL?
+- ¿Qué herramientas de IA utilizaste y qué cambios revisaste o ajustaste por tu cuenta?
+
+## Evidencias
+
+Agrega aquí las capturas solicitadas por la guía, incluida la petición autenticada que muestre el encabezado `Authorization: Bearer ...`. Oculta el valor del token antes de compartir la captura.
