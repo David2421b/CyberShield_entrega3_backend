@@ -4,12 +4,12 @@ API REST de la Entrega 3 de CyberShield Academy. Está desarrollada con Node.js,
 
 ## Enlaces de la entrega
 
-- API desplegada: **pendiente de publicar**.
-- Frontend desplegado: **pendiente de publicar**.
-- Repositorio público del backend: **pendiente de publicar**.
-- Repositorio público del frontend: **pendiente de publicar**.
+- API desplegada: [cybershield-api-un20.onrender.com](https://cybershield-api-un20.onrender.com).
+- Frontend desplegado: [cyber-shield-entrega3-frontend.vercel.app](https://cyber-shield-entrega3-frontend.vercel.app).
+- Repositorio público del backend: [CyberShield_entrega3_backend](https://github.com/David2421b/CyberShield_entrega3_backend).
+- Repositorio público del frontend: [CyberShield_entrega3_frontend](https://github.com/David2421b/CyberShield_entrega3_frontend).
 
-Completa estos enlaces después de publicar los repositorios y desplegar la aplicación. No subas archivos `.env` ni secretos al repositorio.
+No subas archivos `.env` ni secretos al repositorio.
 
 ## Funcionalidades
 
