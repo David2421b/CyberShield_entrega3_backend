@@ -71,12 +71,14 @@ La API queda disponible en `http://localhost:4000`. Comprueba el estado en `http
 | `JWT_EXPIRES_IN` | Vigencia del token; el valor predeterminado es `1d`. |
 | `PORT` | Puerto HTTP de la API; el valor predeterminado es `4000`. |
 | `FRONTEND_URL` | Origen permitido por CORS. En producción debe coincidir exactamente con la URL de Vercel. |
+| `DEMO_ADMIN_PASSWORD` | Contraseña opcional para la cuenta admin que crea el seed; localmente usa `Admin123!` si no se define. |
+| `DEMO_USER_PASSWORD` | Contraseña opcional para la cuenta user que crea el seed; localmente usa `User123!` si no se define. |
 
 En producción configura estas variables en el servicio del backend, junto con una base PostgreSQL administrada. Ejecuta `npx prisma migrate deploy` para aplicar las migraciones existentes. `npm run prisma:migrate` usa `prisma migrate dev` y se reserva para desarrollo local.
 
 ## Cuentas de demostración
 
-El seed crea estas cuentas para la revisión local de la entrega:
+El seed crea estas cuentas para la revisión local de la entrega. Puedes reemplazar las contraseñas mediante `DEMO_ADMIN_PASSWORD` y `DEMO_USER_PASSWORD` antes de ejecutarlo:
 
 | Rol | Correo | Contraseña |
 | --- | --- | --- |
@@ -121,7 +123,9 @@ El backend valida el JWT y vuelve a comprobar los permisos en cada ruta protegid
 
 ## Despliegue
 
-El backend está preparado para ejecutarse en Render o Railway, pero el servicio público aún está pendiente de publicación. Configura el comando de compilación con `npm run prisma:generate && npm run build` y el comando de inicio con `npm run start`. Añade una base PostgreSQL y configura los secretos descritos arriba. En `FRONTEND_URL` coloca el origen exacto del frontend desplegado; CORS no usa el comodín `*`.
+El backend está preparado para ejecutarse en Render o Railway, pero el servicio público aún está pendiente de publicación. El archivo `render.yaml` define una API y una base PostgreSQL para Render: compila el proyecto, aplica las migraciones al iniciar y carga el seed una sola vez después del primer despliegue exitoso. Durante la creación del Blueprint, proporciona contraseñas fuertes para `DEMO_ADMIN_PASSWORD` y `DEMO_USER_PASSWORD`. Si Vercel aún no está desplegado, usa `http://localhost:3000` como `FRONTEND_URL` temporal y cámbiala al origen público exacto cuando tengas la URL. CORS no usa el comodín `*`.
+
+La configuración inicial usa los planes gratuitos de Render para una revisión académica. Render indica que sus bases PostgreSQL gratuitas expiran a los 30 días; actualiza a un plan con persistencia antes de depender de esos datos por más tiempo.
 
 ## Explicación para la sustentación
 

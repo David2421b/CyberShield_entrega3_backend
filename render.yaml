@@ -1,0 +1,34 @@
+databases:
+  - name: cybershield-db
+    databaseName: cybershield
+    user: cybershield
+    plan: free
+    region: ohio
+    postgresMajorVersion: "16"
+    ipAllowList: []
+
+services:
+  - type: web
+    name: cybershield-api
+    runtime: node
+    plan: free
+    region: ohio
+    buildCommand: npm ci && npm run prisma:generate && npm run build
+    startCommand: npx prisma migrate deploy && npm run start
+    healthCheckPath: /api/health
+    initialDeployHook: npm run prisma:seed
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cybershield-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        sync: false
+      - key: DEMO_ADMIN_PASSWORD
+        sync: false
+      - key: DEMO_USER_PASSWORD
+        sync: false

@@ -88,8 +88,8 @@ const courses = [
 ];
 
 async function main() {
-  const adminPassword = await hash("Admin123!", 12);
-  const userPassword = await hash("User123!", 12);
+  const adminPassword = await hash(process.env.DEMO_ADMIN_PASSWORD || "Admin123!", 12);
+  const userPassword = await hash(process.env.DEMO_USER_PASSWORD || "User123!", 12);
 
   await prisma.user.upsert({
     where: { email: "admin@cybershield.local" },
